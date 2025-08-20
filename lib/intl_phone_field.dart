@@ -13,6 +13,7 @@ import './phone_number.dart';
 class IntlPhoneField extends StatefulWidget {
   /// The TextFormField key.
   final GlobalKey<FormFieldState>? formFieldKey;
+  final String? Function(String?)? myValidator;
 
   /// Whether to hide the text being edited (e.g., for passwords).
   final bool obscureText;
@@ -283,6 +284,7 @@ class IntlPhoneField extends StatefulWidget {
     this.dropdownIcon = const Icon(Icons.arrow_drop_down),
     this.autofocus = false,
     this.textInputAction,
+    this.myValidator,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.showCountryFlag = true,
     this.cursorColor,
@@ -427,16 +429,18 @@ class _IntlPhoneFieldState extends State<IntlPhoneField> {
 
         widget.onChanged?.call(phoneNumber);
       },
-      validator: (value) {
-        if (value == null || !isNumeric(value)) return validatorMessage;
-        if (!widget.disableLengthCheck) {
-          return value.length >= _selectedCountry.minLength && value.length <= _selectedCountry.maxLength
-              ? null
-              : widget.invalidNumberMessage;
-        }
+      validator:
+          widget.myValidator ??
+          (value) {
+            if (value == null || !isNumeric(value)) return validatorMessage;
+            if (!widget.disableLengthCheck) {
+              return value.length >= _selectedCountry.minLength && value.length <= _selectedCountry.maxLength
+                  ? null
+                  : widget.invalidNumberMessage;
+            }
 
-        return validatorMessage;
-      },
+            return validatorMessage;
+          },
       maxLength: widget.disableLengthCheck ? null : _selectedCountry.maxLength,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
